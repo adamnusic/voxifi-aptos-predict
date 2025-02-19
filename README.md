@@ -1,4 +1,3 @@
-
 # VoxiFi - AI Voice Authentication Platform
 
 VoxiFi is a web application that combines agent and crowd intelligence for voice authentication. Users can listen to audio clips and vote on their authenticity using the Aptos blockchain for verification.
