@@ -24,13 +24,13 @@ export function AudioComparison() {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       <PredictionCard
         audioId="clip1"
-        audioUrl="/attached_assets/audio.wav"
+        audioUrl="/assets/audio.wav"
         predictions={clip1Predictions}
         title="Audio Clip 1"
       />
       <PredictionCard
         audioId="clip2"
-        audioUrl="/attached_assets/TrumpTalk.m4a"
+        audioUrl="/assets/TrumpTalk.m4a"
         predictions={clip2Predictions}
         title="Audio Clip 2"
       />
