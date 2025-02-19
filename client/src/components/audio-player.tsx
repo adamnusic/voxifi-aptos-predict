@@ -73,10 +73,16 @@ export function AudioPlayer({ url }: AudioPlayerProps) {
 
   const progress = (currentTime / duration) * 100;
 
-  // Generate waveform bars
-  const bars = Array.from({ length: 40 }, (_, i) => {
-    const height = 30 + Math.sin(i * 0.5) * 20; // Create a wave pattern
-    return height;
+  // Generate waveform bars with more varied heights
+  const bars = Array.from({ length: 60 }, (_, i) => {
+    // Create a more complex pattern using multiple sine waves
+    const height = 
+      25 + // Base height
+      Math.sin(i * 0.2) * 15 + // Primary wave
+      Math.sin(i * 0.5) * 10 + // Secondary wave
+      Math.sin(i * 0.8) * 5 + // Tertiary wave
+      (Math.random() * 5); // Small random variation
+    return Math.max(15, Math.min(85, height)); // Clamp between 15% and 85%
   });
 
   return (
@@ -105,14 +111,14 @@ export function AudioPlayer({ url }: AudioPlayerProps) {
               <div
                 key={i}
                 className={cn(
-                  "w-[2px] bg-primary/30 rounded-full transition-all duration-300",
+                  "w-[1px] bg-primary/30 rounded-full transition-all duration-300",
                   i < (progress / 100) * bars.length ? "bg-primary" : "",
                   isPlaying && "animate-[wave_2s_ease-in-out_infinite]"
                 )}
                 style={{
                   height: `${height}%`,
-                  animationDelay: `${i * 0.05}s`,
-                  transform: `scaleY(${isPlaying ? 1 + Math.sin(i * 0.5) * 0.2 : 1})`,
+                  animationDelay: `${i * 0.03}s`,
+                  transform: `scaleY(${isPlaying ? 1 + Math.sin(i * 0.3) * 0.15 : 1})`,
                 }}
               />
             ))}
