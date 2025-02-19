@@ -23,7 +23,7 @@ export default function Home() {
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto text-center mb-12 space-y-4">
           <h2 className="text-4xl font-bold tracking-tight">
-            Voice Authentication Powered by Crowd Intelligence
+            Advanced Voice Authentication Technology
           </h2>
           <p className="text-xl text-muted-foreground">
             Listen to the audio clips and help us identify which one is authentic
