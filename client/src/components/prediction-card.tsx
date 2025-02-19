@@ -52,12 +52,12 @@ export function PredictionCard({ audioId, audioUrl, predictions, title }: Predic
         <CardHeader className="pb-2">
           <CardTitle className="text-xl font-semibold">{title}</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="aspect-square relative bg-muted rounded-lg overflow-hidden group">
+        <CardContent className="space-y-4">
+          <div className="h-48 relative bg-muted rounded-lg overflow-hidden group">
             <motion.img
               src="/assets/trump.webp"
               alt="Donald Trump"
-              className="w-full h-full object-cover transition-transform group-hover:scale-105"
+              className="w-full h-full object-cover object-center transition-transform group-hover:scale-105"
               initial={{ scale: 1 }}
               whileHover={{ scale: 1.05 }}
             />
@@ -66,7 +66,7 @@ export function PredictionCard({ audioId, audioUrl, predictions, title }: Predic
 
           <AudioPlayer url={audioUrl} />
 
-          <div className="space-y-6">
+          <div className="grid grid-cols-2 gap-4">
             <motion.div 
               className="space-y-2"
               initial={{ opacity: 0, x: -20 }}
