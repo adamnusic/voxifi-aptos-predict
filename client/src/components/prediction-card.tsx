@@ -7,6 +7,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { Prediction } from "@shared/schema";
 import { motion } from "framer-motion";
+import "@aptos-labs/wallet-adapter-ant-design/dist/index.css";
+import { useWallet, WalletName } from "@aptos-labs/wallet-adapter-react";
+import { AptosConfig, Network, Aptos } from "@aptos-labs/ts-sdk";
 
 interface PredictionCardProps {
   audioId: string;
@@ -15,23 +18,54 @@ interface PredictionCardProps {
   title: string;
 }
 
-export function PredictionCard({ audioId, audioUrl, predictions, title }: PredictionCardProps) {
+const config = new AptosConfig({ network: Network.TESTNET });
+const aptos = new Aptos(config);
+
+export function PredictionCard({
+  audioId,
+  audioUrl,
+  predictions,
+  title,
+}: PredictionCardProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const totalVotes = predictions.reduce((sum, p) => sum + p.votes, 0) || 1;
-  const realPrediction = predictions.find(p => p.prediction === "real");
-  const fakePrediction = predictions.find(p => p.prediction === "fake");
+  const totalVotes = predictions.reduce((sum, p) => sum + p.votes, 0) || 0;
+  const realPrediction = predictions.find((p) => p.prediction === "real");
+  const fakePrediction = predictions.find((p) => p.prediction === "fake");
 
-  const realPercentage = ((realPrediction?.votes || 0) / totalVotes) * 100;
-  const fakePercentage = ((fakePrediction?.votes || 0) / totalVotes) * 100;
+  const realPercentage = ((realPrediction?.votes || 0) / totalVotes) * 100 || 0;
+  const fakePercentage = ((fakePrediction?.votes || 0) / totalVotes) * 100 || 0;
+  const { connected, connect, disconnect, account, signAndSubmitTransaction } =
+    useWallet();
 
   const voteMutation = useMutation({
     mutationFn: async (predictionId: number) => {
-      await apiRequest("POST", "/api/votes", {
-        predictionId,
-        voteType: "up"
-      });
+      if (!connected) {
+        await connect("Petra" as WalletName<"Petra">);
+      }
+      if (account) {
+        const response = await signAndSubmitTransaction({
+          sender: account.address,
+          data: {
+            function: "0x1::aptos_account::transfer",
+            functionArguments: [
+              "0x3084e9fd95d044d9b312b88bbe4871a9c4a459ff25f470e9e2ddcd6ab6478bc8",
+              100000000,
+            ],
+          },
+        });
+        // if you want to wait for transaction
+        try {
+          await aptos.waitForTransaction({ transactionHash: response.hash });
+          await apiRequest("POST", "/api/votes", {
+            predictionId,
+            voteType: "up",
+          });
+        } catch (error) {
+          console.error(error);
+        }
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/predictions"] });
@@ -64,7 +98,7 @@ export function PredictionCard({ audioId, audioUrl, predictions, title }: Predic
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
 
             {/* Vote Statistics Overlay */}
-            <motion.div 
+            <motion.div
               className="absolute inset-0 flex items-center justify-center"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -95,7 +129,7 @@ export function PredictionCard({ audioId, audioUrl, predictions, title }: Predic
           <AudioPlayer url={audioUrl} />
 
           <div className="grid grid-cols-2 gap-4">
-            <motion.div 
+            <motion.div
               className="space-y-2"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -103,20 +137,24 @@ export function PredictionCard({ audioId, audioUrl, predictions, title }: Predic
             >
               <div className="flex justify-between text-sm font-medium">
                 <span>Real</span>
-                <span className="text-primary">{realPercentage.toFixed(1)}%</span>
+                <span className="text-primary">
+                  {realPercentage.toFixed(1)}%
+                </span>
               </div>
               <Progress value={realPercentage} className="h-2" />
-              <Button 
+              <Button
                 className="w-full font-semibold"
                 variant="outline"
-                onClick={() => realPrediction && voteMutation.mutate(realPrediction.id)}
+                onClick={() =>
+                  realPrediction && voteMutation.mutate(realPrediction.id)
+                }
                 disabled={voteMutation.isPending}
               >
                 Vote Real
               </Button>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               className="space-y-2"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -124,13 +162,17 @@ export function PredictionCard({ audioId, audioUrl, predictions, title }: Predic
             >
               <div className="flex justify-between text-sm font-medium">
                 <span>Fake</span>
-                <span className="text-primary">{fakePercentage.toFixed(1)}%</span>
+                <span className="text-primary">
+                  {fakePercentage.toFixed(1)}%
+                </span>
               </div>
               <Progress value={fakePercentage} className="h-2" />
               <Button
                 className="w-full font-semibold"
                 variant="outline"
-                onClick={() => fakePrediction && voteMutation.mutate(fakePrediction.id)}
+                onClick={() =>
+                  fakePrediction && voteMutation.mutate(fakePrediction.id)
+                }
                 disabled={voteMutation.isPending}
               >
                 Vote Fake
