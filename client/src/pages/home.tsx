@@ -26,7 +26,7 @@ export default function Home() {
             Voice Authentication Powered by Agent/Crowd Intelligence
           </h2>
           <p className="text-xl text-muted-foreground">
-            Listen to the audio clips and help us identify which one is authentic
+            Listen to the audio clips and identify which one is authentic
           </p>
         </div>
 
