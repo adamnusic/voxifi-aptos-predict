@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Play, Pause, Volume2, VolumeX } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface AudioPlayerProps {
   url: string;
@@ -13,7 +14,7 @@ export function AudioPlayer({ url }: AudioPlayerProps) {
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
   const [isMuted, setIsMuted] = useState(false);
-  
+
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
@@ -37,7 +38,7 @@ export function AudioPlayer({ url }: AudioPlayerProps) {
 
   const togglePlay = () => {
     if (!audioRef.current) return;
-    
+
     if (isPlaying) {
       audioRef.current.pause();
     } else {
@@ -70,30 +71,57 @@ export function AudioPlayer({ url }: AudioPlayerProps) {
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
+  const progress = (currentTime / duration) * 100;
+
   return (
     <div className="space-y-2">
       <audio ref={audioRef} src={url} />
-      
+
       <div className="flex items-center gap-2">
         <Button
           variant="ghost"
           size="icon"
           onClick={togglePlay}
-          className="h-8 w-8"
+          className={cn(
+            "h-8 w-8 transition-transform",
+            isPlaying && "scale-105"
+          )}
         >
           {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
         </Button>
-        
+
         <span className="text-sm w-16">{formatTime(currentTime)}</span>
-        
-        <Slider
-          value={[currentTime]}
-          max={duration}
-          step={0.1}
-          onValueChange={handleSeek}
-          className="flex-1"
-        />
-        
+
+        <div className="relative flex-1">
+          {/* Waveform background */}
+          <div 
+            className="absolute inset-0 h-2 bg-gradient-to-r from-primary/20 via-primary/40 to-primary/20 
+                     rounded-full overflow-hidden"
+            style={{
+              maskImage: "repeating-linear-gradient(to right, transparent, transparent 2px, black 2px, black 4px)"
+            }}
+          />
+
+          {/* Progress fill */}
+          <div 
+            className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary via-primary to-primary/80 
+                     rounded-full transition-all duration-150"
+            style={{ 
+              width: `${progress}%`,
+              maskImage: "repeating-linear-gradient(to right, transparent, transparent 2px, black 2px, black 4px)"
+            }}
+          />
+
+          {/* Interactive slider */}
+          <Slider
+            value={[currentTime]}
+            max={duration}
+            step={0.1}
+            onValueChange={handleSeek}
+            className="relative z-10"
+          />
+        </div>
+
         <span className="text-sm w-16 text-right">{formatTime(duration)}</span>
       </div>
 
@@ -106,7 +134,7 @@ export function AudioPlayer({ url }: AudioPlayerProps) {
         >
           {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
         </Button>
-        
+
         <Slider
           value={[isMuted ? 0 : volume]}
           max={1}
