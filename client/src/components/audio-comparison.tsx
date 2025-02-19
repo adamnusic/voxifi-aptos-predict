@@ -30,7 +30,7 @@ export function AudioComparison() {
       />
       <PredictionCard
         audioId="clip2"
-        audioUrl="/assets/TrumpTalk.m4a"
+        audioUrl="/assets/Trump2.m4a"
         predictions={clip2Predictions}
         title="Audio Clip 2"
       />
