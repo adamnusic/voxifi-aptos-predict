@@ -21,7 +21,7 @@ export function PredictionCard({ audioId, audioUrl, predictions, title }: Predic
   const totalVotes = predictions.reduce((sum, p) => sum + p.votes, 0) || 1;
   const realPrediction = predictions.find(p => p.prediction === "real");
   const fakePrediction = predictions.find(p => p.prediction === "fake");
-  
+
   const realPercentage = ((realPrediction?.votes || 0) / totalVotes) * 100;
   const fakePercentage = ((fakePrediction?.votes || 0) / totalVotes) * 100;
 
@@ -49,14 +49,14 @@ export function PredictionCard({ audioId, audioUrl, predictions, title }: Predic
       <CardContent className="space-y-6">
         <div className="aspect-square relative bg-muted rounded-lg overflow-hidden">
           <img
-            src="/attached_assets/trump.webp"
+            src="/assets/trump.webp"
             alt="Donald Trump"
             className="w-full h-full object-cover"
           />
         </div>
-        
+
         <AudioPlayer url={audioUrl} />
-        
+
         <div className="space-y-4">
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
