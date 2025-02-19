@@ -73,6 +73,12 @@ export function AudioPlayer({ url }: AudioPlayerProps) {
 
   const progress = (currentTime / duration) * 100;
 
+  // Generate waveform bars
+  const bars = Array.from({ length: 40 }, (_, i) => {
+    const height = 30 + Math.sin(i * 0.5) * 20; // Create a wave pattern
+    return height;
+  });
+
   return (
     <div className="space-y-2">
       <audio ref={audioRef} src={url} />
@@ -92,25 +98,33 @@ export function AudioPlayer({ url }: AudioPlayerProps) {
 
         <span className="text-sm w-16">{formatTime(currentTime)}</span>
 
-        <div className="relative flex-1">
-          {/* Waveform background */}
-          <div 
-            className="absolute inset-0 h-2 bg-gradient-to-r from-primary/20 via-primary/40 to-primary/20 
-                     rounded-full overflow-hidden"
-            style={{
-              maskImage: "repeating-linear-gradient(to right, transparent, transparent 2px, black 2px, black 4px)"
-            }}
-          />
+        <div className="relative flex-1 h-10 flex items-center">
+          {/* Waveform bars */}
+          <div className="absolute inset-0 flex items-center justify-between px-2">
+            {bars.map((height, i) => (
+              <div
+                key={i}
+                className={cn(
+                  "w-[2px] bg-primary/30 rounded-full transition-all duration-300",
+                  i < (progress / 100) * bars.length ? "bg-primary" : "",
+                  isPlaying && "animate-[wave_2s_ease-in-out_infinite]"
+                )}
+                style={{
+                  height: `${height}%`,
+                  animationDelay: `${i * 0.05}s`,
+                  transform: `scaleY(${isPlaying ? 1 + Math.sin(i * 0.5) * 0.2 : 1})`,
+                }}
+              />
+            ))}
+          </div>
 
-          {/* Progress fill */}
-          <div 
-            className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary via-primary to-primary/80 
-                     rounded-full transition-all duration-150"
-            style={{ 
-              width: `${progress}%`,
-              maskImage: "repeating-linear-gradient(to right, transparent, transparent 2px, black 2px, black 4px)"
-            }}
-          />
+          {/* Playhead */}
+          <div
+            className="absolute h-full pointer-events-none"
+            style={{ left: `${progress}%` }}
+          >
+            <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-primary shadow-lg" />
+          </div>
 
           {/* Interactive slider */}
           <Slider
