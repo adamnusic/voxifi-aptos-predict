@@ -61,7 +61,35 @@ export function PredictionCard({ audioId, audioUrl, predictions, title }: Predic
               initial={{ scale: 1 }}
               whileHover={{ scale: 1.05 }}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+
+            {/* Vote Statistics Overlay */}
+            <motion.div 
+              className="absolute inset-0 flex items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              <div className="text-white text-center space-y-2 px-4">
+                <div className="text-3xl font-bold">
+                  {totalVotes} <span className="text-lg">votes</span>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-2xl font-bold text-green-400">
+                      {realPercentage.toFixed(0)}%
+                    </div>
+                    <div className="text-sm opacity-80">Real</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-red-400">
+                      {fakePercentage.toFixed(0)}%
+                    </div>
+                    <div className="text-sm opacity-80">Fake</div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           </div>
 
           <AudioPlayer url={audioUrl} />
